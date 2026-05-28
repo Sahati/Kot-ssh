@@ -1,12 +1,12 @@
-FROM alpine:latest
+FROM henrist/wetty
 
-RUN apk add --no-cache openssh-server nodejs npm \
-    && npm install -g wetty \
-    && mkdir /var/run/sshd \
-    && echo 'root:tech' | chpasswd \
-    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
-    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+# Устанавливаем пароль для пользователя внутри образа
+RUN echo 'root:tech' | chpasswd
 
-EXPOSE 80
+# На некоторых версиях нужно разрешить вход по паролю
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config || true
 
-CMD ["wetty", "--port", "80", "--host", "0.0.0.0", "--command", "ssh root@127.0.0.1"]
+EXPOSE 3000
+
+# Запускаем wetty на порту 3000 (стандарт для этого образа)
+CMD ["--port", "3000", "--host", "0.0.0.0", "--command", "login"]
