@@ -2,11 +2,11 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Устанавливаем всё напрямую из стандартных репозиториев Ubuntu
 RUN apt-get update && apt-get install -y \
     openssh-server \
-    curl \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
+    nodejs \
+    npm \
     && npm install -g wetty \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,5 +17,4 @@ RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/
 
 EXPOSE 80
 
-# Используем полный путь к wetty
-CMD ["/usr/bin/wetty", "--port", "80", "--host", "0.0.0.0", "--command", "ssh root@127.0.0.1"]
+CMD ["wetty", "--port", "80", "--host", "0.0.0.0", "--command", "ssh root@127.0.0.1"]
