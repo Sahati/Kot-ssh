@@ -1,11 +1,22 @@
 FROM wettyoss/wetty:latest
 
-# Устанавливаем пароль (пусть будет на всякий случай)
-RUN echo 'root:tech' | chpasswd
+USER root
 
-# Говорим Render использовать порт 3000 автоматически
+# Устанавливаем OpenSSH сервер
+RUN apk update && apk add --no-cache openssh-server
+
+# Настраиваем SSH: разрешаем вход по паролю и генерируем ключи
+RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config && \
+    echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
+    ssh-keygen -A
+
+# Создаем пользователя 'kot' и задаем ему пароль 'kot'
+RUN adduser -D -s /bin/sh kot && \
+    echo "kot:kot" | chpasswd
+
+# Переменная порта для Render
 ENV PORT=3000
-
 EXPOSE 3000
 
-CMD ["--port", "3000", "--host", "0.0.0.0", "--command", "sh"]
+# Запускаем SSH-сервер на внутреннем порту 80, а Wetty заставляем подключаться к нему локально
+CMD /usr/sbin/sshd -p 80 && node index.js --port 3000 --host 0.0.0.0 --title "Kot-ssh" --command "ssh kot@127.0.0.1 -p 80"
