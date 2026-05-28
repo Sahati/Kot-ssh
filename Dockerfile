@@ -1,4 +1,4 @@
-FROM henrist/wetty
+FROM wettyoss/wetty:latest
 
 # Устанавливаем пароль
 RUN echo 'root:tech' | chpasswd
