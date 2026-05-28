@@ -1,19 +1,11 @@
-FROM ubuntu:22.04
+FROM alpine:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Устанавливаем всё напрямую из стандартных репозиториев Ubuntu
-RUN apt-get update && apt-get install -y \
-    openssh-server \
-    nodejs \
-    npm \
-    && npm install -g wetty \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir /var/run/sshd
-RUN echo 'root:tech' | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+# Устанавливаем всё необходимое одной командой
+RUN apk add --no-cache openssh-server nodejs npm wetty \
+    && mkdir /var/run/sshd \
+    && echo 'root:tech' | chpasswd \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 EXPOSE 80
 
