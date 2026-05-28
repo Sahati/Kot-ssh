@@ -1,6 +1,7 @@
 FROM alpine:latest
 
-RUN apk add --no-cache openssh-server nodejs npm wetty \
+RUN apk add --no-cache openssh-server nodejs npm \
+    && npm install -g wetty \
     && mkdir /var/run/sshd \
     && echo 'root:tech' | chpasswd \
     && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
@@ -8,5 +9,4 @@ RUN apk add --no-cache openssh-server nodejs npm wetty \
 
 EXPOSE 80
 
-# Указываем точный путь к wetty в Alpine
-CMD ["/usr/bin/wetty", "--port", "80", "--host", "0.0.0.0", "--command", "ssh root@127.0.0.1"]
+CMD ["wetty", "--port", "80", "--host", "0.0.0.0", "--command", "ssh root@127.0.0.1"]
