@@ -18,5 +18,5 @@ RUN adduser -D -s /bin/sh kot && \
 ENV PORT=3000
 EXPOSE 3000
 
-# Запускаем SSH-сервер на внутреннем порту 80, а Wetty заставляем подключаться к нему локально
-CMD /usr/sbin/sshd -p 80 && node index.js --port 3000 --host 0.0.0.0 --title "Kot-ssh" --command "ssh kot@127.0.0.1 -p 80"
+# Запускаем SSH, спим 3 секунды, затем запускаем Wetty с игнорированием проверки ключей хоста
+CMD /usr/sbin/sshd -p 80 && sleep 3 && node index.js --port 3000 --host 0.0.0.0 --title "Kot-ssh" --command "ssh -o StrictHostKeyChecking=no kot@127.0.0.1 -p 80"
